@@ -1,12 +1,20 @@
 const { BN } = require('bn.js');
-const { getPubKey, getPublicKeyDerBytesFromKMS } = require('../utils/awsKms');
+const { kms, getPubKey } = require('../utils/awsKms');
 const { keccak256, getAddress, recoverAddress } = require('../utils/ethereum');
+const asn1 = require('asn1.js');
 
 const awsKmsSignOperationMessageType = 'DIGEST';
 const awsKmsSignOperationSigningAlgorithm = 'ECDSA_SHA_256';
 
 const secp256k1N = new BN('FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141', 16);
 const secp256k1HalfN = secp256k1N.div(new BN(2));
+
+const EcdsaSigAsnParse = asn1.define('EcdsaSigAsnParse', function() {
+  this.seq().obj(
+    this.key('r').int(),
+    this.key('s').int()
+  );
+});
 
 async function signEthereumMessage(keyId, ethSignedMessageHash) {
   const signParams = {
@@ -33,6 +41,11 @@ async function signEthereumMessage(keyId, ethSignedMessageHash) {
 
     const pubKey = await getPubKey(keyId);
     const v = recoverAddress(ethSignedMessageHash, r, s, pubKey);
+
+    // console.log('Public Key:', pubKey);
+    // console.log('r:', rHex);
+    // console.log('s:', sHex);
+    // console.log('v:', v);
 
     return `0x${rHex}${sHex}${v.toString(16).padStart(2, '0')}`;
   } catch (err) {

@@ -35,6 +35,7 @@ async function getPubKey(keyId) {
 }
 
 module.exports = {
+  kms,
   getPublicKeyDerBytesFromKMS,
   getPubKey
 };
