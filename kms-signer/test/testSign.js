@@ -1,7 +1,7 @@
 require('dotenv').config();
-const { getPubKey, signEthereumMessage } = require('./lib/kmsSigner');
+const { getPubKey, signEthereumMessage } = require('../lib/kmsSigner');
 const { BN, keccak256, bufferToHex } = require('ethereumjs-util');
-const { getAddress } = require('./utils/ethereum');
+const { getAddress } = require('../utils/ethereum');
 
 (async () => {
   const keyID = process.env.AWS_KMS_KEY_ID;
